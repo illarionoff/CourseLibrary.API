@@ -27,8 +27,9 @@ namespace CourseLibrary.API.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+
         [HttpGet]
-        public ActionResult<IEnumerable<CourseDto>> GetCourserForAuthor(Guid authorId)
+        public ActionResult<IEnumerable<CourseDto>> GetCoursesForAuthor(Guid authorId)
         {
             if (!_courseLibraryRepository.AuthorExists(authorId)) return NotFound();
 
@@ -135,6 +136,29 @@ namespace CourseLibrary.API.Controllers
             _mapper.Map(courseToPatch, courseForUpdate); 
             _courseLibraryRepository.UpdateCourse(courseForUpdate);
             _courseLibraryRepository.Save();
+            return NoContent();
+
+        }
+
+        [HttpDelete("{courseId}")]
+        public ActionResult DeleteCourseForAuthor(Guid authorId, Guid courseId)
+        {
+            if (!_courseLibraryRepository.AuthorExists(authorId))
+            {
+                return NotFound();
+            }
+
+            var courseForUpdate = _courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if (courseForUpdate == null)
+            {
+                return NotFound();
+            }
+
+            _courseLibraryRepository.DeleteCourse(courseForUpdate);
+
+            _courseLibraryRepository.Save();
+
             return NoContent();
 
         }
